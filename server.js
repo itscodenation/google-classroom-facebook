@@ -26,13 +26,34 @@ let creds;
 
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "./index.html")));
 
+app.get("/courses", (req, res) => {
+  authorize(creds, (auth) => {
+    const classroom = google.classroom({version: 'v1', auth});
+    classroom.courses.list({
+      pageSize: 10,
+    }, (err, gcres) => {
+      if(err) { return console.error('The API returned an error: ' + err); }
+
+      const courses = gcres.data.courses.map(course => {
+        return {
+          name: course.name,
+          id: course.id,
+          url: course.alternateLink,
+          state: course.courseState
+        };
+      });
+
+      res.json(courses);
+    });
+  });
+});
+
 app.get("/photos", (req, res) => {
-  // Load client secrets from a local file.
   authorize(creds, (auth) => {
     const classroom = google.classroom({version: 'v1', auth});
     classroom.courses.students.list({
       pageSize: 0,
-      courseId: streetAcademyId
+      courseId: req.query.course_id
     }, (err, gcres) => {
       if (err) return console.error('The API returned an error: ' + err + err.code);
       const students = gcres.data.students.map(student => {
