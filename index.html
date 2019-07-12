@@ -121,18 +121,18 @@ function init(pictures) {
     return { nextQuestion };
 }
 
-setTimeout(() => {
-    let pictures = [
-        { name: "a", picture: "https://placekitten.com/g/200/300" },
-        { name: "b", picture: "https://placekitten.com/g/202/300" },
-        { name: "c", picture: "https://placekitten.com/g/201/300" },
-        { name: "d", picture: "https://placekitten.com/g/203/300" },
-    ];
+var xhr = new XMLHttpRequest();
+xhr.open('GET', 'myservice/username?id=some-unique-id');
+xhr.onload = function() {
+    if (xhr.status !== 200) { alert("Error: "); }
+
+    let pictures = JSON.parse(xhr.responseText);
     let game = init(pictures);
 
     document.getElementsByTagName("body")[0].className = "is-playing";
     game.nextQuestion();
-}, 500)
+};
+xhr.send();
 </script>
 </body>
 </html>

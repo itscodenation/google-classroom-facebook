@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/xavi-/google-classroom-facebook#readme",
   "dependencies": {
+    "express": "^4.17.1",
     "googleapis": "^41.0.0"
   }
 }
