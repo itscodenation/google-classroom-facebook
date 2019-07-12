@@ -7,6 +7,12 @@ body {
   font-family: Arial,"Helvetica Neue",Helvetica,sans-serif;
 }
 
+.is-loading #flash-card-game { display: none; }
+.is-loading #loading { display: block; }
+
+.is-playing #flash-card-game { display: block; }
+.is-playing #loading { display: none; }
+
 #options {
 	position: relative;
     list-style: none;
@@ -58,59 +64,75 @@ body {
 .option-picked .click-catcher{ display: block; }
 </style>
 </head>
-<body>
+<body class="is-loading">
 <h1>Who is this?</h1>
-<img id="student" src="">
-<ul id="options"></ul>
+<div id="loading">
+    <h2>Loading data...</h2>
+</div>
+<div id="flash-card-game">
+    <img id="student" src="">
+    <ul id="options"></ul>
+</div>
 <script>
-let pictures = [
-    { name: "a", picture: "https://placekitten.com/g/200/300" },
-    { name: "b", picture: "https://placekitten.com/g/202/300" },
-    { name: "c", picture: "https://placekitten.com/g/201/300" },
-    { name: "d", picture: "https://placekitten.com/g/203/300" },
-];
-let students = pictures.map(p => p.name);
-let pool = [];
+function init(pictures) {
+    let students = pictures.map(p => p.name);
+    let pool = [];
 
-function renderOptions(options, correctAnswer) {
-	document.getElementById("options").className = "";
+    function renderOptions(options, correctAnswer) {
+        document.getElementById("options").className = "";
 
-	let html = options.map(function(opt) {
-		let btnClass = (opt === correctAnswer ? "correct-answer" : "wrong-answer");
-		return "<li><a class='option " + btnClass + "'>" + opt + "</a></li>";
-	}).join("") + "<div class='click-catcher'/>";
+        let html = options.map(function(opt) {
+            let btnClass = (opt === correctAnswer ? "correct-answer" : "wrong-answer");
+            return "<li><a class='option " + btnClass + "'>" + opt + "</a></li>";
+        }).join("") + "<div class='click-catcher'/>";
 
-	document.getElementById("options").innerHTML = html;
+        document.getElementById("options").innerHTML = html;
+    }
+
+    function nextQuestion() {
+        if(pool.length < 1) { pool = students.slice(0); /* clones array */ }
+
+        let idx = Math.random() * pool.length | 0;
+        let student = pool.splice(idx, 1)[0];
+        document.getElementById("student").src = pictures.find(p => p.name == student).picture;
+
+        let options = [ student ];
+        while(options.length < 5 && options.length < students.length) {
+            let option = students[Math.random() * students.length | 0];
+
+            if(options.indexOf(option) === -1) {
+                options.splice(Math.random() * (options.length + 1) | 0, 0, option); // Insert randomly
+            }
+        }
+
+        renderOptions(options, student);
+    }
+
+    document.getElementById("options").addEventListener("click", function(e) {
+        if(e.target.className.indexOf("option") === -1) { return; }
+
+        e.preventDefault();
+        e.target.className += " selected-option";
+
+        document.getElementById("options").className = "option-picked";
+        setTimeout(nextQuestion, 1000);
+    }, false);
+
+    return { nextQuestion };
 }
 
-function nextQuestion() {
-	if(pool.length < 1) { pool = students.slice(0); /* clones array */ }
+setTimeout(() => {
+    let pictures = [
+        { name: "a", picture: "https://placekitten.com/g/200/300" },
+        { name: "b", picture: "https://placekitten.com/g/202/300" },
+        { name: "c", picture: "https://placekitten.com/g/201/300" },
+        { name: "d", picture: "https://placekitten.com/g/203/300" },
+    ];
+    let game = init(pictures);
 
-	let idx = Math.random() * pool.length | 0;
-	let student = pool.splice(idx, 1)[0];
-	document.getElementById("student").src = pictures.find(p => p.name == student).picture;
-
-	let options = [ student ];
-	while(options.length < 5 && options.length < students.length) {
-		let option = students[Math.random() * students.length | 0];
-
-		if(options.indexOf(option) === -1) {
-			options.splice(Math.random() * (options.length + 1) | 0, 0, option); // Insert randomly
-		}
-	}
-
-	renderOptions(options, student);
-}
-
-document.getElementById("options").addEventListener("click", function(e) {
-	if(e.target.className.indexOf("option") === -1) { return; }
-
-	e.preventDefault();
-	e.target.className += " selected-option";
-
-	document.getElementById("options").className = "option-picked";
-	setTimeout(nextQuestion, 1000);
-}, false);
-nextQuestion();
+    document.getElementsByTagName("body")[0].className = "is-playing";
+    game.nextQuestion();
+}, 500)
 </script>
 </body>
+</html>
