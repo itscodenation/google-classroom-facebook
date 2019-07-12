@@ -36,16 +36,10 @@ app.get("/photos", (req, res) => {
         courseId: streetAcademyId
       }, (err, gcres) => {
         if (err) return console.error('The API returned an error: ' + err + err.code);
-        const students = gcres.data.students;
-        results = []
-        for (var i=0; i < students.length; i++) {
-            result = {
-                name: students[i].profile.name.fullName,
-                picture: students[i].profile.photoUrl,
-            }
-            results.push(result)
-        }
-        res.json(results)
+        const students = gcres.data.students.map(student => {
+          return { name: student.profile.name.fullName, photo: student.profile.photoUrl };
+        });
+        res.json(students)
       });
     });
   });

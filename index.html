@@ -76,8 +76,8 @@ body {
     <ul id="options"></ul>
 </div>
 <script>
-function init(pictures) {
-    let students = pictures.map(p => p.name);
+function init(photos) {
+    let students = photos.map(p => p.name);
     let pool = [];
 
     function renderOptions(options, correctAnswer) {
@@ -96,7 +96,7 @@ function init(pictures) {
 
         let idx = Math.random() * pool.length | 0;
         let student = pool.splice(idx, 1)[0];
-        document.getElementById("student").src = pictures.find(p => p.name == student).picture;
+        document.getElementById("student").src = photos.find(p => p.name == student).photo;
 
         let options = [ student ];
         while(options.length < 5 && options.length < students.length) {
@@ -128,8 +128,8 @@ xhr.open('GET', '/photos');
 xhr.onload = function() {
     if (xhr.status !== 200) { return alert("Error: "); }
 
-    let pictures = JSON.parse(xhr.responseText);
-    let game = init(pictures);
+    let photos = JSON.parse(xhr.responseText);
+    let game = init(photos);
 
     document.getElementsByTagName("body")[0].className = "is-playing";
     game.nextQuestion();
