@@ -1,0 +1,22 @@
+{
+  "name": "google-classroom-facebook",
+  "version": "1.0.0",
+  "description": "App to create a flash game of student faces using google classroom",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xavi-/google-classroom-facebook.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xavi-/google-classroom-facebook/issues"
+  },
+  "homepage": "https://github.com/xavi-/google-classroom-facebook#readme",
+  "dependencies": {
+    "googleapis": "^41.0.0"
+  }
+}
