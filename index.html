@@ -122,9 +122,9 @@ function init(pictures) {
 }
 
 var xhr = new XMLHttpRequest();
-xhr.open('GET', 'myservice/username?id=some-unique-id');
+xhr.open('GET', '/photos');
 xhr.onload = function() {
-    if (xhr.status !== 200) { alert("Error: "); }
+    if (xhr.status !== 200) { return alert("Error: "); }
 
     let pictures = JSON.parse(xhr.responseText);
     let game = init(pictures);
