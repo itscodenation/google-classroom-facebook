@@ -1,8 +1,116 @@
+
+<!doctype html>
 <html>
 <head>
-    
+<style>
+body {
+  font-family: Arial,"Helvetica Neue",Helvetica,sans-serif;
+}
+
+#options {
+	position: relative;
+    list-style: none;
+    padding: 0;
+}
+
+.option {
+	text-transform: capitalize;
+	border-radius: 5px;
+	padding: 5px;
+	text-decoration: none;
+	margin: 0 0 10px 0;
+	color: #fff;
+	position: relative;
+	display: inline-block;
+	width: 150px;
+	cursor: pointer;
+	text-align: center;
+
+	-webkit-transition: background-color 100ms linear;
+	-ms-transition: background-color 100ms linear;
+	transition: background-color 100ms linear;
+}
+
+.option:active {
+	transform: translate(0px, 5px);
+	-webkit-transform: translate(0px, 5px);
+	box-shadow: 0px 1px 0px 0px;
+}
+
+.option { background-color: #55acee; box-shadow: 0px 5px 0px 0px #3C93D5; }
+.option:hover { background-color: #6FC6FF; }
+
+.option-picked .correct-answer { background-color: #2ecc71; box-shadow: 0px 5px 0px 0px #15B358; }
+.option-picked .correct-answer:hover { background-color: #48E68B; }
+
+.wrong-answer.selected-option { background-color: #e74c3c; box-shadow: 0px 5px 0px 0px #CE3323; }
+.wrong-answer.selected-option:hover { background-color: #FF6656; }
+
+.click-catcher {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	display: none;
+	z-index: 1000;
+}
+.option-picked .click-catcher{ display: block; }
+</style>
 </head>
 <body>
+<h1>Who is this?</h1>
+<img id="student" src="">
+<ul id="options"></ul>
+<script>
+let pictures = [
+    { name: "a", picture: "https://placekitten.com/g/200/300" },
+    { name: "b", picture: "https://placekitten.com/g/202/300" },
+    { name: "c", picture: "https://placekitten.com/g/201/300" },
+    { name: "d", picture: "https://placekitten.com/g/203/300" },
+];
+let students = pictures.map(p => p.name);
+let pool = [];
 
+function renderOptions(options, correctAnswer) {
+	document.getElementById("options").className = "";
+
+	let html = options.map(function(opt) {
+		let btnClass = (opt === correctAnswer ? "correct-answer" : "wrong-answer");
+		return "<li><a class='option " + btnClass + "'>" + opt + "</a></li>";
+	}).join("") + "<div class='click-catcher'/>";
+
+	document.getElementById("options").innerHTML = html;
+}
+
+function nextQuestion() {
+	if(pool.length < 1) { pool = students.slice(0); /* clones array */ }
+
+	let idx = Math.random() * pool.length | 0;
+	let student = pool.splice(idx, 1)[0];
+	document.getElementById("student").src = pictures.find(p => p.name == student).picture;
+
+	let options = [ student ];
+	while(options.length < 5 && options.length < students.length) {
+		let option = students[Math.random() * students.length | 0];
+
+		if(options.indexOf(option) === -1) {
+			options.splice(Math.random() * (options.length + 1) | 0, 0, option); // Insert randomly
+		}
+	}
+
+	renderOptions(options, student);
+}
+
+document.getElementById("options").addEventListener("click", function(e) {
+	if(e.target.className.indexOf("option") === -1) { return; }
+
+	e.preventDefault();
+	e.target.className += " selected-option";
+
+	document.getElementById("options").className = "option-picked";
+	setTimeout(nextQuestion, 1000);
+}, false);
+nextQuestion();
+</script>
 </body>
-</html>
