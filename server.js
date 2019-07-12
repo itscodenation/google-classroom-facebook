@@ -22,31 +22,35 @@ const TOKEN_PATH = 'token.json';
 const streetAcademyId = '15075960905';
 const testClassId = '40854525995';
 
+let creds;
+
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "./index.html")));
 
 app.get("/photos", (req, res) => {
   // Load client secrets from a local file.
-  fs.readFile('credentials.json', (err, content) => {
-    if (err) return console.log('Error loading client secret file:', err);
-    // Authorize a client with credentials, then call the Google Classroom API.
-    authorize(JSON.parse(content), (auth) => {
-      const classroom = google.classroom({version: 'v1', auth});
-      classroom.courses.students.list({
-        pageSize: 0,
-        courseId: streetAcademyId
-      }, (err, gcres) => {
-        if (err) return console.error('The API returned an error: ' + err + err.code);
-        const students = gcres.data.students.map(student => {
-          return { name: student.profile.name.fullName, photo: student.profile.photoUrl };
-        });
-        res.json(students)
+  authorize(creds, (auth) => {
+    const classroom = google.classroom({version: 'v1', auth});
+    classroom.courses.students.list({
+      pageSize: 0,
+      courseId: streetAcademyId
+    }, (err, gcres) => {
+      if (err) return console.error('The API returned an error: ' + err + err.code);
+      const students = gcres.data.students.map(student => {
+        return { name: student.profile.name.fullName, photo: student.profile.photoUrl };
       });
+      res.json(students)
     });
   });
 });
 
-app.listen(port, () => console.log(`Listening on port ${port}!`));
+fs.readFile('credentials.json', (err, content) => {
+  if(err) { return console.log('Error loading client secret file:', err); }
+  // Authorize a client with credentials, then call the Google Classroom API.
 
+  creds = JSON.parse(content);
+
+  app.listen(port, () => console.log(`Listening on port ${port}!`));
+});
 
 
 
