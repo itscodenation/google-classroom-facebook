@@ -1,4 +1,7 @@
+const path = require("path");
+
 const express = require("express");
+
 const app = express();
 const port = 3000;
 const fs = require('fs');
@@ -19,7 +22,7 @@ const TOKEN_PATH = 'token.json';
 const streetAcademyId = '15075960905';
 const testClassId = '40854525995';
 
-app.get("/", (req, res) => res.send("google classroom facebook"));
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "./index.html")));
 
 app.get("/photos", (req, res) => {
     // Load client secrets from a local file.
