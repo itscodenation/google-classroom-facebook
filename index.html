@@ -84,8 +84,8 @@ body {
     <ul id="options"></ul>
 </div>
 <script>
-function createGame(photos) {
-    let students = photos.map(p => p.name);
+function createGame(profiles) {
+    let students = profiles.map(p => p.name);
     let pool = [];
 
     function renderOptions(options, correctAnswer) {
@@ -104,7 +104,7 @@ function createGame(photos) {
 
         let idx = Math.random() * pool.length | 0;
         let student = pool.splice(idx, 1)[0];
-        document.getElementById("student").src = photos.find(p => p.name == student).photo;
+        document.getElementById("student").src = profiles.find(p => p.name == student).photo;
 
         let options = [ student ];
         while(options.length < 5 && options.length < students.length) {
