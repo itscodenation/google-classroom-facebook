@@ -7,17 +7,11 @@ body {
   font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
 }
 
+#loading, #choose-course, #flash-card-game { display: none; }
+
 .is-loading #loading { display: block; }
-.is-loading #flash-card-game,
-.is-loading #choose-course { display: none; }
-
 .is-choosing-course #choose-course { display: block; }
-.is-choosing-course #loading,
-.is-choosing-course #flash-card-game { display: none; }
-
 .is-playing #flash-card-game { display: block; }
-.is-playing #loading,
-.is-playing #choose-course { display: none; }
 
 
 #student { width: 150px; padding: 0 5px; }
