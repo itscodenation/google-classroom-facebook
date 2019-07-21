@@ -65,10 +65,8 @@ app.get("/photos", (req, res) => {
 });
 
 fs.readFile('credentials.json', (err, content) => {
-  if(err) { return console.log('Error loading client secret file:', err); }
-  // Authorize a client with credentials, then call the Google Classroom API.
-
-  creds = JSON.parse(content);
+  if(err) { console.warn('Error loading client secret file:', err); }
+  else { creds = JSON.parse(content); }
 
   app.listen(port, () => console.log(`Listening on port ${port}!`));
 });
