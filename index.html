@@ -4,7 +4,7 @@
 <head>
 <style>
 body {
-  font-family: Arial,"Helvetica Neue",Helvetica,sans-serif;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
 }
 
 .is-loading #loading { display: block; }
@@ -117,7 +117,7 @@ function createGame(photos) {
             let option = students[Math.random() * students.length | 0];
 
             if(options.indexOf(option) === -1) {
-                options.splice(Math.random() * (options.length + 1) | 0, 0, option); // Insert randomly
+                options.splice(Math.random() * (options.length + 1) | 0, 0, option); // Random insert
             }
         }
 
