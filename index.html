@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html>
 <head>
@@ -90,19 +89,20 @@ body {
 <script src="https://apis.google.com/js/api.js"></script>
 <script>
 function authorize(callback) {
+	const SCOPES = [
+		'https://www.googleapis.com/auth/classroom.courses.readonly',
+		'https://www.googleapis.com/auth/classroom.profile.photos',
+		'https://www.googleapis.com/auth/classroom.rosters.readonly',
+	].join(" ");
 	let config = {
 		'apiKey': 'AIzaSyDhP7cfYme795mDLjqBrS_lpovY4Imc0Oc',
 		'discoveryDocs': [ "https://www.googleapis.com/discovery/v1/apis/classroom/v1/rest" ],
 		'clientId': '885544404811-b1a3397hc05c9arjbkupaufg2no1ii8l.apps.googleusercontent.com',
-		'scope': [
-			'https://www.googleapis.com/auth/classroom.courses.readonly',
-			'https://www.googleapis.com/auth/classroom.profile.photos',
-			'https://www.googleapis.com/auth/classroom.rosters.readonly',
-		].join(" ")
+		'scope': SCOPES
 	};
 
 
-    let GoogleAuth;
+	let GoogleAuth;
 	let client = {
 		user() {
 			return GoogleAuth.currentUser.get();
