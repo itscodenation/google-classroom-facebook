@@ -16,7 +16,7 @@ body {
 
 #student { width: 150px; padding: 0 5px; }
 
-#courses a { width: 200px; }
+#courses button { width: 200px; }
 
 #courses,
 #options {
@@ -25,16 +25,17 @@ body {
     padding: 0;
 }
 
-.option {
+button {
 	text-transform: capitalize;
+	border: none;
 	border-radius: 5px;
 	padding: 5px;
 	text-decoration: none;
+	font-size: .8em;
 	margin: 0 0 10px 0;
 	color: #fff;
 	position: relative;
 	display: inline-block;
-	width: 150px;
 	cursor: pointer;
 	text-align: center;
 
@@ -43,14 +44,15 @@ body {
 	transition: background-color 100ms linear;
 }
 
-.option:active {
+button:active {
+	outline: none;
 	transform: translate(0px, 5px);
 	-webkit-transform: translate(0px, 5px);
 	box-shadow: 0px 1px 0px 0px;
 }
 
-.option { background-color: #55acee; box-shadow: 0px 5px 0px 0px #3C93D5; }
-.option:hover { background-color: #6FC6FF; }
+button { background-color: #55acee; box-shadow: 0px 5px 0px 0px #3C93D5; }
+button:hover { background-color: #6FC6FF; }
 
 .option-picked .correct-answer { background-color: #2ecc71; box-shadow: 0px 5px 0px 0px #15B358; }
 .option-picked .correct-answer:hover { background-color: #48E68B; }
@@ -75,7 +77,7 @@ body {
     <h1>Loading data...</h1>
 </div>
 <div id="authorize">
-    <button id="sign-in" class="option">Sign In</button>
+    <button id="sign-in">Sign In</button>
 </div>
 <div id="choose-course">
     <h1>Choose a Classroom</h1>
@@ -173,7 +175,7 @@ function createGame(profiles) {
 
         let html = options.map(function(opt) {
             let btnClass = (opt === correctAnswer ? "correct-answer" : "wrong-answer");
-            return "<li><a class='option " + btnClass + "'>" + opt + "</a></li>";
+            return "<li><button class='option " + btnClass + "'>" + opt + "</button></li>";
         }).join("") + "<div class='click-catcher'/>";
 
         document.getElementById("options").innerHTML = html;
