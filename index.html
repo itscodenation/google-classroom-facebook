@@ -3,10 +3,10 @@
 <head>
 <style>
 body {
-  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-  display: flex;
-  justify-content: center;
-  text-align: center;
+	font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+	display: flex;
+	justify-content: center;
+	text-align: center;
 }
 
 #loading, #authorize, #choose-course, #flash-card-game { display: none; }
@@ -17,11 +17,11 @@ body {
 .is-playing #flash-card-game { display: block; }
 
 #sign-in {
-  padding: 15px 30px;
-  margin: 15px;
-  text-transform: none;
-  font-size: 1rem;
-  font-weight: bold;
+	padding: 15px 30px;
+	margin: 15px;
+	text-transform: none;
+	font-size: 1rem;
+	font-weight: bold;
 }
 
 #courses button { width: 200px; }
@@ -29,8 +29,8 @@ body {
 #courses,
 #options {
 	position: relative;
-    list-style: none;
-    padding: 0;
+	list-style: none;
+	padding: 0;
 }
 
 #options .option,
@@ -85,19 +85,19 @@ button:hover { background-color: #6FC6FF; }
 </head>
 <body class="is-loading">
 <div id="loading">
-    <h1>Loading data...</h1>
+	<h1>Loading data...</h1>
 </div>
 <div id="authorize">
-    <button id="sign-in">Sign in with Google Classroom</button>
+	<button id="sign-in">Sign in with Google Classroom</button>
 </div>
 <div id="choose-course">
-    <h1>Choose a Classroom</h1>
-    <ul id="courses"></ul>
+	<h1>Choose a Classroom</h1>
+	<ul id="courses"></ul>
 </div>
 <div id="flash-card-game">
-    <h1>Who is this?</h1>
-    <img id="student" src="">
-    <ul id="options"></ul>
+	<h1>Who is this?</h1>
+	<img id="student" src="">
+	<ul id="options"></ul>
 </div>
 <script src="https://apis.google.com/js/api.js"></script>
 <script>
@@ -113,7 +113,6 @@ function authorize(callback) {
 		'clientId': '885544404811-b1a3397hc05c9arjbkupaufg2no1ii8l.apps.googleusercontent.com',
 		'scope': SCOPES
 	};
-
 
 	let GoogleAuth;
 	let client = {
@@ -144,10 +143,10 @@ function authorize(callback) {
 		}
 	};
 
-    // Load the API's client and auth2 modules.
-    // Call the initClient function after the modules load.
-    gapi.load('client:auth2', () => {
-        gapi.client.init(config).then(() => {
+	// Load the API's client and auth2 modules.
+	// Call the initClient function after the modules load.
+	gapi.load('client:auth2', () => {
+		gapi.client.init(config).then(() => {
 			GoogleAuth = gapi.auth2.getAuthInstance();
 
 			if (GoogleAuth.isSignedIn.get()) { return callback(null, client); 	}
@@ -173,76 +172,75 @@ function authorize(callback) {
 					}
 				);
 			});
-        });
-    });
+		});
+	});
 }
 
 function createGame(profiles) {
-    let students = profiles.map(p => p.name);
-    let pool = [];
+	let students = profiles.map(p => p.name);
+	let pool = [];
 
-    function renderOptions(options, correctAnswer) {
-        document.getElementById("options").className = "";
+	function renderOptions(options, correctAnswer) {
+		document.getElementById("options").className = "";
 
-        let html = options.map(function(opt) {
-            let btnClass = (opt === correctAnswer ? "correct-answer" : "wrong-answer");
-            return "<li><button class='option " + btnClass + "'>" + opt + "</button></li>";
-        }).join("") + "<div class='click-catcher'/>";
+		let html = options.map(function(opt) {
+			let btnClass = (opt === correctAnswer ? "correct-answer" : "wrong-answer");
+			return "<li><button class='option " + btnClass + "'>" + opt + "</button></li>";
+		}).join("") + "<div class='click-catcher'/>";
 
-        document.getElementById("options").innerHTML = html;
-    }
+		document.getElementById("options").innerHTML = html;
+	}
 
-    function nextQuestion() {
-        if(pool.length < 1) { pool = students.slice(0); /* clones array */ }
+	function nextQuestion() {
+		if(pool.length < 1) { pool = students.slice(0); /* clones array */ }
 
-        let idx = Math.random() * pool.length | 0;
-        let student = pool.splice(idx, 1)[0];
-        document.getElementById("student").src = profiles.find(p => p.name == student).photo;
+		let idx = Math.random() * pool.length | 0;
+		let student = pool.splice(idx, 1)[0];
+		document.getElementById("student").src = profiles.find(p => p.name == student).photo;
 
-        let options = [ student ];
-        while(options.length < 5 && options.length < students.length) {
-            let option = students[Math.random() * students.length | 0];
+		let options = [ student ];
+		while(options.length < 5 && options.length < students.length) {
+			let option = students[Math.random() * students.length | 0];
 
-            if(options.indexOf(option) === -1) {
-                options.splice(Math.random() * (options.length + 1) | 0, 0, option); // Random insert
-            }
-        }
+			if(options.indexOf(option) === -1) {
+				options.splice(Math.random() * (options.length + 1) | 0, 0, option); // Random insert
+			}
+		}
 
-        renderOptions(options, student);
-    }
+		renderOptions(options, student);
+	}
 
-    document.getElementById("options").addEventListener("click", function(e) {
-		let target = e.target.getElementsByClassName("option")[0] || e.target;
-        if(target.className.indexOf("option") === -1) { return; }
+	document.getElementById("options").addEventListener("click", function(e) {
+	let target = e.target.getElementsByClassName("option")[0] || e.target;
+		if(target.className.indexOf("option") === -1) { return; }
 
-        e.preventDefault();
-        target.className += " selected-option";
+		e.preventDefault();
+		target.className += " selected-option";
 
-        document.getElementById("options").className = "option-picked";
-        setTimeout(nextQuestion, 1000);
-    }, false);
+		document.getElementById("options").className = "option-picked";
+		setTimeout(nextQuestion, 1000);
+	}, false);
 
-    return { nextQuestion };
+	return { nextQuestion };
 }
 
 function displayCourseChooser(courses, callback) {
-    let html = courses.map(course => {
-		return "<li><button class='option' data-course-id='" + course.id + "'>" +
+	let html = courses.map(course => {
+	return "<li><button class='option' data-course-id='" + course.id + "'>" +
 			course.name +
-        "</button></li>";
-    }).join("");
+		"</button></li>";
+	}).join("");
 
-    document.getElementById("courses").innerHTML = html;
-    document.getElementById("courses").addEventListener("click", function(e) {
-		let target = e.target.getElementsByClassName("option")[0] || e.target;
-        if(target.className.indexOf("option") === -1) { return; }
+	document.getElementById("courses").innerHTML = html;
+	document.getElementById("courses").addEventListener("click", function(e) {
+	let target = e.target.getElementsByClassName("option")[0] || e.target;
+		if(target.className.indexOf("option") === -1) { return; }
 
-        e.preventDefault();
-        target.className += " selected-option";
+		e.preventDefault();
+		target.className += " selected-option";
 
-        callback(null, target.dataset["courseId"]);
-    }, false);
-
+		callback(null, target.dataset["courseId"]);
+	}, false);
 }
 
 document.getElementsByTagName("body")[0].className = "is-loading";
