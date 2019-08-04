@@ -212,10 +212,11 @@ function createGame(profiles) {
     }
 
     document.getElementById("options").addEventListener("click", function(e) {
-        if(e.target.className.indexOf("option") === -1) { return; }
+		let target = e.target.getElementsByClassName("option")[0] || e.target;
+        if(target.className.indexOf("option") === -1) { return; }
 
         e.preventDefault();
-        e.target.className += " selected-option";
+        target.className += " selected-option";
 
         document.getElementById("options").className = "option-picked";
         setTimeout(nextQuestion, 1000);
@@ -226,19 +227,20 @@ function createGame(profiles) {
 
 function displayCourseChooser(courses, callback) {
     let html = courses.map(course => {
-        return "<li><a class='option' href='" + course.url +
-            "' data-course-id='" + course.id + "'>" + course.name +
-        "</a></li>";
+		return "<li><button class='option' data-course-id='" + course.id + "'>" +
+			course.name +
+        "</button></li>";
     }).join("");
 
     document.getElementById("courses").innerHTML = html;
     document.getElementById("courses").addEventListener("click", function(e) {
-        if(e.target.className.indexOf("option") === -1) { return; }
+		let target = e.target.getElementsByClassName("option")[0] || e.target;
+        if(target.className.indexOf("option") === -1) { return; }
 
         e.preventDefault();
-        e.target.className += " selected-option";
+        target.className += " selected-option";
 
-        callback(null, e.target.dataset["courseId"]);
+        callback(null, target.dataset["courseId"]);
     }, false);
 
 }
