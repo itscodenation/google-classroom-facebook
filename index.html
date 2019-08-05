@@ -232,7 +232,7 @@ function createGame(profiles) {
 
 function displayCourseChooser(courses, callback) {
 	let html = courses.map(course => {
-	return "<li><button class='option' data-course-id='" + course.id + "'>" +
+		return "<li><button class='option' data-course-id='" + course.id + "'>" +
 			course.name +
 		"</button></li>";
 	}).join("");
