@@ -10,12 +10,13 @@ body {
 	text-align: center;
 }
 
-#loading, #authorize, #choose-course, #flash-cards { display: none; }
+#loading, #authorize, #choose-course, #view-all, #flash-cards { display: none; }
 
 .is-loading #loading { display: block; }
 .is-authorizing #authorize { display: block; }
 .is-choosing-course #choose-course { display: block; }
 .is-playing #flash-cards { display: block; }
+.is-viewing-all #view-all { display: block; }
 
 #sign-in {
 	padding: 15px 30px;
@@ -46,6 +47,27 @@ body {
 .back:before { content: "⮐"; margin-right: 5px; }
 
 #sign-out { position: absolute; right: 0; padding: 0 10px; cursor: pointer; }
+
+#all-students { cursor: pointer; }
+
+.classroom { display: flex; flex-wrap: wrap; justify-content: center; margin-bottom: 50px; }
+.student {
+	border: 1px solid grey;
+	border-radius: 10px;
+	padding: 15px 10px 10px;
+	margin: 15px;
+	text-align: center;
+	width: 200px;
+}
+.student img { width: 150px; border-radius: 10px; }
+.student span { font-weight: bold; display: block; margin-top: 5px; }
+
+@media print {
+  #view-all .back { display: none; }
+	#view-all h2 { page-break-before: always; margin: 5px 0; }
+	.classroom { display: block; }
+	.student { display: inline-block; page-break-inside: avoid; width: 25vw; margin: 1vw; }
+}
 
 button {
 	text-transform: capitalize;
@@ -105,6 +127,12 @@ button:hover { background-color: #6FC6FF; }
 	<a id="sign-out">Sign out</a>
 	<h1>Choose a Classroom</h1>
 	<ul id="courses"></ul>
+	<a id="all-students">View all students</a>
+</div>
+<div id="view-all">
+	<a id="previous-screen" class="back">Back</a>
+	<div id="classrooms"></div>
+</div>
 </div>
 <div id="flash-cards">
 	<a id="previous-screen" class="back">Back</a>
@@ -250,7 +278,7 @@ function createGame(profiles, previousScreen) {
 	return { nextQuestion };
 }
 
-function displayCourseChooser(courses, signOut, callback) {
+function displayCourseChooser(courses, signOut, viewAll, callback) {
 	function renderCourse() {
 		document.getElementsByTagName("body")[0].className = "is-choosing-course";
 
@@ -268,6 +296,10 @@ function displayCourseChooser(courses, signOut, callback) {
 			e.preventDefault();
 			signOut();
 		});
+		document.getElementById("all-students").addEventListener("click", function(e) {
+			e.preventDefault();
+			viewAll();
+		});
 		document.getElementById("courses").addEventListener("click", function(e) {
 		let target = e.target.getElementsByClassName("option")[0] || e.target;
 			if(target.className.indexOf("option") === -1) { return; }
@@ -282,6 +314,37 @@ function displayCourseChooser(courses, signOut, callback) {
 	}
 
 	renderCourse();
+	attachListeners();
+}
+
+function displayAllStudents(classrooms, previousScreen) {
+	function renderAll() {
+		document.getElementsByTagName("body")[0].className = "is-viewing-all";
+
+		let html = classrooms.map(classroom => {
+			let students = classroom.students.sort((a, b) => a.name.localeCompare(b.name));
+			let studentHtml = students.map(profile =>
+				`<div class="student"><img src="${profile.photo}"><span>${profile.name}</span></div>`
+			).join("");
+
+			return `<h2>${classroom.course.name}</h2><div class="classroom">${studentHtml}</div>`;
+		}).join("")
+
+		document.getElementById("classrooms").innerHTML = html;
+	}
+
+	function attachListeners() {
+		if(displayAllStudents.isAttached) { return; }
+
+		document.querySelector("#view-all .back").addEventListener("click", function(e) {
+			e.preventDefault();
+			previousScreen();
+		});
+
+		displayAllStudents.isAttached = true;
+	}
+
+	renderAll();
 	attachListeners();
 }
 
@@ -302,10 +365,22 @@ authorize((err, client) => {
 			});
 		};
 
+		let viewAll = () => {
 			document.getElementsByTagName("body")[0].className = "is-loading";
 
+			Promise.all(courses.map(course => client.profiles(course.id))).then(
+				(profiles) => {
+					let classrooms = courses.map((course, idx) => {
+						return { course, students: profiles[idx] };
+					});
+					displayAllStudents(classrooms, displayScreen);
+				},
+				(err) => alert(err),
+			);
+		}
+
 		let displayScreen = () => {
-			displayCourseChooser(courses, signOut, (err, courseId) => {
+			displayCourseChooser(courses, signOut, viewAll, (err, courseId) => {
 				if(err) { return alert(err); }
 
 				document.getElementsByTagName("body")[0].className = "is-loading";
