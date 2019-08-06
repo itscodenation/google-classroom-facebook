@@ -10,12 +10,12 @@ body {
 	text-align: center;
 }
 
-#loading, #authorize, #choose-course, #flash-card-game { display: none; }
+#loading, #authorize, #choose-course, #flash-cards { display: none; }
 
 .is-loading #loading { display: block; }
 .is-authorizing #authorize { display: block; }
 .is-choosing-course #choose-course { display: block; }
-.is-playing #flash-card-game { display: block; }
+.is-playing #flash-cards { display: block; }
 
 #sign-in {
 	padding: 15px 30px;
@@ -25,7 +25,7 @@ body {
 	font-weight: bold;
 }
 
-#flash-card-game,
+#flash-cards,
 #choose-course { width: 100vw; }
 
 #courses,
@@ -100,7 +100,7 @@ button:hover { background-color: #6FC6FF; }
 	<h1>Choose a Classroom</h1>
 	<ul id="courses"></ul>
 </div>
-<div id="flash-card-game">
+<div id="flash-cards">
 	<img id="student" src="">
 	<ul id="options"></ul>
 </div>
