@@ -191,7 +191,7 @@ function createGame(profiles) {
 
 		let html = options.map(function(opt) {
 			let btnClass = (opt === correctAnswer ? "correct-answer" : "wrong-answer");
-			return "<li><button class='option " + btnClass + "'>" + opt + "</button></li>";
+			return `<li><button class="option ${btnClass}">${opt}</button></li>`;
 		}).join("") + "<div class='click-catcher'/>";
 
 		document.getElementById("options").innerHTML = html;
@@ -231,11 +231,9 @@ function createGame(profiles) {
 }
 
 function displayCourseChooser(courses, callback) {
-	let html = courses.map(course => {
-		return "<li><button class='option' data-course-id='" + course.id + "'>" +
-			course.name +
-		"</button></li>";
-	}).join("");
+	let html = courses.map(course =>
+		`<li><button class="option" data-course="${course.id}">${course.name}</button></li>`
+	).join("");
 
 	document.getElementById("courses").innerHTML = html;
 	document.getElementById("courses").addEventListener("click", function(e) {
