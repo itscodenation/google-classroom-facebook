@@ -18,9 +18,29 @@ body {
 .is-playing #flash-cards { display: block; }
 .is-viewing-all #view-all { display: block; }
 
+#error {
+	display: none;
+	position: absolute;
+	z-index: 1;
+	width: 70vw;
+	max-width: 400px;
+	left: 50%;
+	transform: translate(-50%, 0);
+	top: 0;
+	background: #ff4f4f;
+	border-radius: 0 0 5px 5px;
+	padding: 10px 1.5vw;
+	text-align: center;
+	font-weight: bold;
+	color: white;
+	transition: opacity 100ms linear;
+	box-shadow: 0px 1px 5px darkred;
+	overflow-wrap: break-word;
+}
+
 #sign-in {
 	padding: 15px 30px;
-	margin: 15px;
+	margin: 50px;
 	text-transform: none;
 	font-size: 1rem;
 	font-weight: bold;
@@ -117,6 +137,7 @@ button:hover { background-color: #6FC6FF; }
 </style>
 </head>
 <body class="is-loading">
+<div id="error"></div>
 <div id="loading">
 	<h1>Loading data...</h1>
 </div>
@@ -192,7 +213,9 @@ function authorize(callback) {
 
 	// Load the API's client and auth2 modules.
 	// Call the initClient function after the modules load.
-	gapi.load('client:auth2', () => {
+	gapi.load('client:auth2', (err) => {
+		if(err) { return callback(err); }
+
 		gapi.client.init(config).then(() => {
 			let auth = gapi.auth2.getAuthInstance();
 
@@ -200,19 +223,16 @@ function authorize(callback) {
 
 			document.getElementsByTagName("body")[0].className = "is-authorizing";
 			document.getElementById("authorize").addEventListener("click", function(e) {
-				auth.signIn().then(
-					(res) => {
-						let user = auth.currentUser.get();
-						let isAuthorized = user.hasGrantedScopes(SCOPES);
+				auth.signIn().then((res) => {
+					let user = auth.currentUser.get();
+					let isAuthorized = user.hasGrantedScopes(SCOPES);
 
-						if (!isAuthorized) { return callback(new Error("This app was not authorized")); }
+					if (!isAuthorized) { return callback(new Error("This app was not authorized")); }
 
-						return callback(null, createClient(auth));
-					},
-					(err) => callback(err)
-				);
+					return callback(null, createClient(auth));
+				}, (err) => callback(err));
 			});
-		});
+		}, (err) => callback(err));
 	});
 }
 
@@ -348,19 +368,26 @@ function displayAllStudents(classrooms, previousScreen) {
 	attachListeners();
 }
 
+function showError(where, err) {
+	let msg = `${where} error: ${err.details || err.message || err.error || err.toString()}`;
+	document.getElementById("error").textContent = msg;
+	document.getElementById("error").style.display = "block";
+}
+
 document.getElementsByTagName("body")[0].className = "is-loading";
 authorize((err, client) => {
-	if(err) { return alert(err); }
+	if(err) { return showError("Login", err); }
 
 	document.getElementsByTagName("body")[0].className = "is-loading";
 
 	client.courses((err, courses) => {
-		if(err) { return alert(err); }
+		if(err) { return showError("Google API", err); }
 
 		let signOut = () => {
 			document.getElementsByTagName("body")[0].className = "is-loading";
 			client.signOut((err) => {
-				if(err) { return alert(err); }
+				if(err) { return showError("Sign out", err); }
+
 				window.location.reload();
 			});
 		};
@@ -375,13 +402,13 @@ authorize((err, client) => {
 					});
 					displayAllStudents(classrooms, displayScreen);
 				},
-				(err) => alert(err),
+				(err) => showError("Google API", err),
 			);
 		}
 
 		let displayScreen = () => {
 			displayCourseChooser(courses, signOut, viewAll, (err, courseId) => {
-				if(err) { return alert(err); }
+				if(err) { return showError("Choose course", err); }
 
 				document.getElementsByTagName("body")[0].className = "is-loading";
 
