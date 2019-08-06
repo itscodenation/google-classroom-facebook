@@ -209,35 +209,56 @@ function createGame(profiles) {
 		renderOptions(options, student);
 	}
 
-	document.getElementById("options").addEventListener("click", function(e) {
-	let target = e.target.getElementsByClassName("option")[0] || e.target;
-		if(target.className.indexOf("option") === -1) { return; }
+	function attachListeners() {
+		if(createGame.isAttached) { return; }
 
-		e.preventDefault();
-		target.className += " selected-option";
+		document.getElementById("options").addEventListener("click", function(e) {
+			let target = e.target.getElementsByClassName("option")[0] || e.target;
+			if(target.className.indexOf("option") === -1) { return; }
 
-		document.getElementById("options").className = "option-picked";
-		setTimeout(nextQuestion, 1000);
-	}, false);
+			e.preventDefault();
+			target.className += " selected-option";
+
+			document.getElementById("options").className = "option-picked";
+			setTimeout(nextQuestion, 1000);
+		}, false);
+
+		createGame.isAttached = true;
+	}
+
+	nextQuestion();
+	attachListeners();
 
 	return { nextQuestion };
 }
 
 function displayCourseChooser(courses, callback) {
-	let html = courses.map(course =>
-		`<li><button class="option" data-course="${course.id}">${course.name}</button></li>`
-	).join("");
+	function renderCourse() {
+		let html = courses.map(course =>
+			`<li><button class="option" data-course="${course.id}">${course.name}</button></li>`
+		).join("");
 
-	document.getElementById("courses").innerHTML = html;
-	document.getElementById("courses").addEventListener("click", function(e) {
-	let target = e.target.getElementsByClassName("option")[0] || e.target;
-		if(target.className.indexOf("option") === -1) { return; }
+		document.getElementById("courses").innerHTML = html;
+	}
 
-		e.preventDefault();
-		target.className += " selected-option";
+	function attachListeners() {
+		if(displayCourseChooser.isAttached){ return; }
 
-		callback(null, target.dataset["courseId"]);
-	}, false);
+		document.getElementById("courses").addEventListener("click", function(e) {
+		let target = e.target.getElementsByClassName("option")[0] || e.target;
+			if(target.className.indexOf("option") === -1) { return; }
+
+			e.preventDefault();
+			target.className += " selected-option";
+
+			callback(null, target.dataset["course"]);
+		}, false);
+
+		displayCourseChooser.isAttached = true;
+	}
+
+	renderCourse();
+	attachListeners();
 }
 
 document.getElementsByTagName("body")[0].className = "is-loading";
