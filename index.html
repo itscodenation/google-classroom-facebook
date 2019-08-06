@@ -226,6 +226,7 @@ function createGame(profiles) {
 		createGame.isAttached = true;
 	}
 
+	document.getElementsByTagName("body")[0].className = "is-playing";
 	nextQuestion();
 	attachListeners();
 
@@ -234,6 +235,8 @@ function createGame(profiles) {
 
 function displayCourseChooser(courses, callback) {
 	function renderCourse() {
+		document.getElementsByTagName("body")[0].className = "is-choosing-course";
+
 		let html = courses.map(course =>
 			`<li><button class="option" data-course="${course.id}">${course.name}</button></li>`
 		).join("");
@@ -270,16 +273,12 @@ authorize((err, client) => {
 	client.courses((err, courses) => {
 		if(err) { return alert(err); }
 
-		document.getElementsByTagName("body")[0].className = "is-choosing-course";
-
 		displayCourseChooser(courses, (err, courseId) => {
 			if(err) { return alert(err); }
 
 			document.getElementsByTagName("body")[0].className = "is-loading";
 
 			client.profiles(courseId, (err, profiles) => {
-				document.getElementsByTagName("body")[0].className = "is-playing";
-
 				let game = createGame(profiles);
 				game.nextQuestion();
 			});
