@@ -45,6 +45,8 @@ body {
 .back { position: absolute; left: 0; padding: 0 10px; cursor: pointer; }
 .back:before { content: "⮐"; margin-right: 5px; }
 
+#sign-out { position: absolute; right: 0; padding: 0 10px; cursor: pointer; }
+
 button {
 	text-transform: capitalize;
 	border: none;
@@ -100,6 +102,7 @@ button:hover { background-color: #6FC6FF; }
 	<button id="sign-in">Sign in with Google Classroom</button>
 </div>
 <div id="choose-course">
+	<a id="sign-out">Sign out</a>
 	<h1>Choose a Classroom</h1>
 	<ul id="courses"></ul>
 </div>
@@ -150,6 +153,13 @@ function authorize(callback) {
 					return students;
 				}, (err) => callback && callback(err) );
 			},
+			signOut(callback) {
+				return auth.signOut().then(
+					(res) => callback(null),
+					(err) => callback(err)
+				);
+			},
+		};
 	}
 
 	// Load the API's client and auth2 modules.
@@ -240,7 +250,7 @@ function createGame(profiles, previousScreen) {
 	return { nextQuestion };
 }
 
-function displayCourseChooser(courses, callback) {
+function displayCourseChooser(courses, signOut, callback) {
 	function renderCourse() {
 		document.getElementsByTagName("body")[0].className = "is-choosing-course";
 
@@ -254,6 +264,10 @@ function displayCourseChooser(courses, callback) {
 	function attachListeners() {
 		if(displayCourseChooser.isAttached){ return; }
 
+		document.getElementById("sign-out").addEventListener("click", function(e) {
+			e.preventDefault();
+			signOut();
+		});
 		document.getElementById("courses").addEventListener("click", function(e) {
 		let target = e.target.getElementsByClassName("option")[0] || e.target;
 			if(target.className.indexOf("option") === -1) { return; }
@@ -280,11 +294,18 @@ authorize((err, client) => {
 	client.courses((err, courses) => {
 		if(err) { return alert(err); }
 
+		let signOut = () => {
+			document.getElementsByTagName("body")[0].className = "is-loading";
+			client.signOut((err) => {
+				if(err) { return alert(err); }
+				window.location.reload();
+			});
+		};
 
 			document.getElementsByTagName("body")[0].className = "is-loading";
 
 		let displayScreen = () => {
-			displayCourseChooser(courses, (err, courseId) => {
+			displayCourseChooser(courses, signOut, (err, courseId) => {
 				if(err) { return alert(err); }
 
 				document.getElementsByTagName("body")[0].className = "is-loading";
