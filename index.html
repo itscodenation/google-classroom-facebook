@@ -42,6 +42,9 @@ body {
 #choose-course button,
 #options .option { width: 75%; max-width: 500px; min-width: 200px; }
 
+.back { position: absolute; left: 0; padding: 0 10px; cursor: pointer; }
+.back:before { content: "⮐"; margin-right: 5px; }
+
 button {
 	text-transform: capitalize;
 	border: none;
@@ -101,6 +104,7 @@ button:hover { background-color: #6FC6FF; }
 	<ul id="courses"></ul>
 </div>
 <div id="flash-cards">
+	<a id="previous-screen" class="back">Back</a>
 	<img id="student" src="">
 	<ul id="options"></ul>
 </div>
@@ -174,7 +178,7 @@ function authorize(callback) {
 	});
 }
 
-function createGame(profiles) {
+function createGame(profiles, previousScreen) {
 	let students = profiles.map(p => p.name);
 	let pool = [];
 
@@ -211,6 +215,10 @@ function createGame(profiles) {
 	function attachListeners() {
 		if(createGame.isAttached) { return; }
 
+		document.querySelector("#flash-cards .back").addEventListener("click", function(e) {
+			e.preventDefault();
+			previousScreen();
+		});
 		document.getElementById("options").addEventListener("click", function(e) {
 			let target = e.target.getElementsByClassName("option")[0] || e.target;
 			if(target.className.indexOf("option") === -1) { return; }
@@ -272,16 +280,22 @@ authorize((err, client) => {
 	client.courses((err, courses) => {
 		if(err) { return alert(err); }
 
-		displayCourseChooser(courses, (err, courseId) => {
-			if(err) { return alert(err); }
 
 			document.getElementsByTagName("body")[0].className = "is-loading";
 
-			client.profiles(courseId, (err, profiles) => {
-				let game = createGame(profiles);
-				game.nextQuestion();
+		let displayScreen = () => {
+			displayCourseChooser(courses, (err, courseId) => {
+				if(err) { return alert(err); }
+
+				document.getElementsByTagName("body")[0].className = "is-loading";
+
+				client.profiles(courseId, (err, profiles) => {
+					createGame(profiles, displayScreen);
+				});
 			});
-		});
+		};
+
+		displayScreen();
 	});
 });
 </script>
